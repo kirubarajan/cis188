@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Installing Python Dependencies
-        run: echo $(ls)
+        run: pip install -r ./requirements.txt
 
       - name: Fetching Pre-Trained Language Model
         run: python -m spacy download en_core_web_trf
