@@ -8,9 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Installing Python Dependencies
-        run: | 
-          cd turing
-          pip install -r requirements.txt
+        run: ls && pip install -r requirements.txt
 
       - name: Fetching Pre-Trained Language Model
         run: python -m spacy download en_core_web_trf
