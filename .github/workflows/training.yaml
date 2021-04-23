@@ -1,0 +1,27 @@
+name: Training Neural Network Model
+
+on:
+  push:
+    branches:
+      - train
+
+jobs:
+  installing:
+    name: Installing Dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Installing Python Dependencies
+        run: pip install -r ./requirements.txt
+
+      - name: Fetching Pre-Trained Language Model
+        run: python -m spacy download en_core_web_trf
+
+  training:
+    name: Training Model
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Training Script
+        uses: python train.py
