@@ -26,4 +26,4 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Generating Model Predictions
-        run: turing-188 generate tests.json
+        run: python turing.py tests.json
