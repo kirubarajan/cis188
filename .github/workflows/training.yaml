@@ -21,6 +21,7 @@ jobs:
 
   training:
     name: Training Model
+    needs: installing
     runs-on: self-hosted
     steps:
       - name: Create Models Directory
@@ -36,3 +37,7 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
           aws_bucket: ${{ secrets.AWS_BUCKET }}
           source_dir: 'models'
+
+      - name: Cleanup Docker
+        if: ${{ always() }}
+        run: docker ps -q | xargs -n 1 -P 8 -I {} docker stop {}
