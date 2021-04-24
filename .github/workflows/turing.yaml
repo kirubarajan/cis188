@@ -16,8 +16,13 @@ jobs:
       - name: Fetching Pre-Trained Language Model
         run: python -m spacy download en_core_web_trf
 
+      - name: Cleanup
+        if: ${{ always() }}
+        run: docker ps -q | xargs -n 1 -P 8 -I {} docker stop {}
+
   evaluate:
     name: Running Turing Evaluation on Model
+    needs: install
     runs-on: self-hosted
     steps:
       - name: Generating Model Predictions
