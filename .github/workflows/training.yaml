@@ -27,7 +27,7 @@ jobs:
         run: mkdir models
   
       - name: Run Training Script
-        uses: python train.py
+        run: python train.py
         
       - name: Upload Trained Model
         uses: shallwefootball/s3-upload-action@master
