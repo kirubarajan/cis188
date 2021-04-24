@@ -151,5 +151,4 @@ for epoch in range(N_EPOCHS):
     print(f'\tTrain Loss: {train_loss:.3f} | Train Acc: {train_acc*100:.2f}%')
     print(f'\t Val. Loss: {valid_loss:.3f} |  Val. Acc: {valid_acc*100:.2f}%')
 
-
-torch.save(model, 'model.jawn')
+torch.save(model, 'models/sentiment.pt')

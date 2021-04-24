@@ -23,5 +23,16 @@ jobs:
     name: Training Model
     runs-on: self-hosted
     steps:
+      - name: Create Models Directory
+        run: mkdir models
+  
       - name: Run Training Script
         uses: python train.py
+        
+      - name: Upload Trained Model
+        uses: shallwefootball/s3-upload-action@master
+        with:
+          aws_key_id: ${{ secrets.AWS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+          aws_bucket: ${{ secrets.AWS_BUCKET }}
+          source_dir: 'models'
