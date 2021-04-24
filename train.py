@@ -119,14 +119,19 @@ def evaluate(model, iterator, criterion):
     model.eval()
     
     with torch.no_grad():
+        i = 0
         for batch in iterator:
+            i += 1
             text, text_lengths = batch.text
             predictions = model(text, text_lengths).squeeze(1)
             loss = criterion(predictions, batch.label)
             acc = binary_accuracy(predictions, batch.label)
             epoch_loss += loss.item()
             epoch_acc += acc.item()
-        
+
+            if i % 10 == 0:
+              print(epoch_acc)
+    
     return epoch_loss / len(iterator), epoch_acc / len(iterator)
   
   
@@ -134,7 +139,7 @@ N_EPOCHS = 1
 
 best_valid_loss = float('inf')
 
-for epoch in range(N_EPOCHS):    
+for epoch in range(N_EPOCHS): 
     train_loss, train_acc = train(model, train_iterator, optimizer, criterion)
     valid_loss, valid_acc = evaluate(model, valid_iterator, criterion)
     
