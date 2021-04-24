@@ -23,6 +23,7 @@ jobs:
     name: Training Model
     needs: installing
     runs-on: self-hosted
+    timeout-minutes: 60
     steps:
       - name: Create Models Directory
         run: mkdir models
