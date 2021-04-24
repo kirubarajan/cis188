@@ -55,14 +55,6 @@ BATCH_SIZE = 64
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 train_iterator, valid_iterator, test_iterator = data.BucketIterator.splits((train_data, valid_data, test_data), batch_size=BATCH_SIZE, sort_within_batch=True, device=device)
 
-"""# Data Playground"""
-
-# example batch text in human-readable format
-batch = next(iter(train_iterator))
-text, text_lengths = batch.text
-for word in text[:,0]:
-  print(TEXT.vocab.itos[word])
-
 """# Model Instantiation"""
 
 # Model Instantiation
@@ -85,6 +77,8 @@ model.embedding.weight.data[PAD_IDX] = torch.zeros(EMBEDDING_DIM)
 """# Model Training"""
 
 # Model Training
+
+print("MODEL TRAINING")
 
 import torch.optim as optim
 
