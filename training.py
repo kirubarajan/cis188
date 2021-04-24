@@ -151,24 +151,5 @@ for epoch in range(N_EPOCHS):
     print(f'\tTrain Loss: {train_loss:.3f} | Train Acc: {train_acc*100:.2f}%')
     print(f'\t Val. Loss: {valid_loss:.3f} |  Val. Acc: {valid_acc*100:.2f}%')
 
-"""# Inference and Usage"""
 
-breakpoint()
-
-# Model Inference
-
-import spacy
-nlp = spacy.load('en')
-
-def predict_sentiment(model, sentence):
-    model.eval()
-    tokenized = [tok.text for tok in nlp.tokenizer(sentence)]
-    indexed = [TEXT.vocab.stoi[t] for t in tokenized]
-    length = [len(indexed)]
-    tensor = torch.LongTensor(indexed).to(device)
-    tensor = tensor.unsqueeze(1)
-    length_tensor = torch.LongTensor(length)
-    prediction = torch.sigmoid(model(tensor, length_tensor))
-    return prediction.item()
-
-predict_sentiment(model, "i hate this movie a lot and it was really bad")
+torch.save(model, 'model.jawn')
