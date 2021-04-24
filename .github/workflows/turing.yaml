@@ -14,7 +14,7 @@ jobs:
         run: pip install -r ./requirements.txt
 
       - name: Fetching Pre-Trained Language Model
-        run: python -m spacy download en_core_web_trf
+        run: python -m spacy download en_core_web_sm
 
       - name: Cleanup
         if: ${{ always() }}
