@@ -5,9 +5,9 @@ on: [push]
 jobs:
   install:
     name: Installing Python Dependencies
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v2
 
       - name: Installing Python Dependencies
@@ -15,3 +15,10 @@ jobs:
 
       - name: Fetching Pre-Trained Language Model
         run: python -m spacy download en_core_web_trf
+
+  evaluate:
+    name: Running Turing Evaluation on Model
+    runs-on: self-hosted
+    steps:
+      - name: Generating Model Predictions
+        run: turing-188 generate tests.json

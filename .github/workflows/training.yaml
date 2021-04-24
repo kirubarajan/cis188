@@ -8,7 +8,7 @@ on:
 jobs:
   installing:
     name: Installing Dependencies
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -21,7 +21,7 @@ jobs:
 
   training:
     name: Training Model
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Run Training Script
         uses: python train.py
