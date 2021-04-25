@@ -1,153 +1,53 @@
-# -*- coding: utf-8 -*-
-
-# Model Definition
-
 import torch
-import torch.nn as nn
+from models import Model
+from data import CorpusDataset
+from decoding import top_k, get_raw_distribution
 
-class RNN(nn.Module):
-  def __init__(self, vocab_size, embedding_dim, hidden_dim, output_dim, n_layers, dropout, pad_idx):
-    super().__init__()
-    self.embedding = nn.Embedding(vocab_size, embedding_dim, padding_idx=pad_idx)
-    self.dropout = nn.Dropout(dropout)
-    self.rnn = nn.LSTM(embedding_dim, hidden_dim, num_layers=n_layers, dropout=dropout)
-    self.fc = nn.Linear(hidden_dim, output_dim)
+# defining hyperparameters
+NUM_EPOCHS = 100
+LEARNING_RATE = 0.01
+GRADIENT_NORM = 5
+EMBEDDING_DIM = 64
+TOP_K = 5
+HIDDEN_DIM = 64
+BATCH_SIZE = 16
+CHUNK_SIZE = 32
+TRAIN_PATH = "data/french.txt"
+
+# instantiating dataset, model, loss function, and optimizer
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+dataset = CorpusDataset(TRAIN_PATH, CHUNK_SIZE, BATCH_SIZE)
+model = Model(EMBEDDING_DIM, HIDDEN_DIM, len(dataset.vocabulary), device)
+criterion = torch.nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
+
+iteration = 0
+
+for i in range(NUM_EPOCHS):
+    hidden_state, cell_state = model.init_hidden(BATCH_SIZE)
     
-  def forward(self, text, text_lengths):
-    embedded = self.dropout(self.embedding(text))
-    packed_embedded = nn.utils.rnn.pack_padded_sequence(embedded, text_lengths)
-    packed_output, (hidden, cell) = self.rnn(packed_embedded)
-    output, output_lengths = nn.utils.rnn.pad_packed_sequence(packed_output) 
-    hidden = self.dropout(hidden[-1,:,:])
-    return self.fc(hidden.squeeze(0))
-  
-  def n_parameters(self):
-    return sum(param.numel() for param in self.parameters() if param.requires_grad)
-
-"""# Data Pre-Processing"""
-
-# Data Pre-Processing
-
-import random
-from torchtext.legacy import data
-from torchtext.legacy import datasets
-
-# Set random seed
-SEED = 1234
-torch.manual_seed(SEED)
-torch.backends.cudnn.deterministic = True
-
-# Creating dataset fields
-TEXT = data.Field(tokenize='spacy', include_lengths=True)
-LABEL = data.LabelField(dtype=torch.float)
-
-# Splitting data
-train_data, test_data = datasets.IMDB.splits(TEXT, LABEL)
-train_data, valid_data = train_data.split(random_state = random.seed(SEED))
-
-# Setting dataset values (and building vocab)
-MAX_VOCAB_SIZE = 25_000
-TEXT.build_vocab(train_data, max_size = MAX_VOCAB_SIZE, vectors="glove.6B.100d", unk_init=torch.Tensor.normal_)
-LABEL.build_vocab(train_data)
-
-# Splitting data into batches (e.g. 64 reviews in each batch, each with a variable amount of words)
-BATCH_SIZE = 64
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-train_iterator, valid_iterator, test_iterator = data.BucketIterator.splits((train_data, valid_data, test_data), batch_size=BATCH_SIZE, sort_within_batch=True, device=device)
-
-"""# Model Instantiation"""
-
-# Model Instantiation
-
-INPUT_DIM = len(TEXT.vocab)
-EMBEDDING_DIM = 100
-HIDDEN_DIM = 256
-OUTPUT_DIM = 1
-N_LAYERS = 2
-DROPOUT = 0.5
-PAD_IDX = TEXT.vocab.stoi[TEXT.pad_token]
-UNK_IDX = TEXT.vocab.stoi[TEXT.unk_token] 
-
-# instantiate models and copy weights
-model = RNN(INPUT_DIM, EMBEDDING_DIM, HIDDEN_DIM, OUTPUT_DIM, N_LAYERS, DROPOUT, PAD_IDX)
-model.embedding.weight.data.copy_(TEXT.vocab.vectors)
-model.embedding.weight.data[UNK_IDX] = torch.zeros(EMBEDDING_DIM)
-model.embedding.weight.data[PAD_IDX] = torch.zeros(EMBEDDING_DIM)
-
-"""# Model Training"""
-
-# Model Training
-
-print("MODEL TRAINING")
-
-import torch.optim as optim
-
-optimizer = optim.Adam(model.parameters())
-criterion = nn.BCEWithLogitsLoss()
-
-model = model.to(device)
-criterion = criterion.to(device)
-
-def binary_accuracy(preds, y):
-    rounded_preds = torch.round(torch.sigmoid(preds))
-    correct = (rounded_preds == y).float()
-    acc = correct.sum() / len(correct)
-    return acc
-  
-def train(model, iterator, optimizer, criterion):
-    model.train()
-    epoch_loss = 0
-    epoch_acc = 0
-    
-    for batch in iterator:
+    for text, target in dataset:
+        model.train()
         optimizer.zero_grad()
-        text, text_lengths = batch.text
-        predictions = model(text, text_lengths).squeeze(1)
-        loss = criterion(predictions, batch.label)
-        acc = binary_accuracy(predictions, batch.label)
-        loss.backward()
-        optimizer.step()
-        epoch_loss += loss.item()
-        epoch_acc += acc.item()
+
+        output, (hidden_state, cell_state) = model(text, (hidden_state, cell_state))
+        loss = criterion(output.transpose(1, 2), target).to(device)
+
+        hidden_state, cell_state = hidden_state.detach(), cell_state.detach()
         
-    return epoch_loss / len(iterator), epoch_acc / len(iterator)
-  
-def evaluate(model, iterator, criterion):
-    epoch_loss = 0
-    epoch_acc = 0
-    
-    model.eval()
-    
-    with torch.no_grad():
-        i = 0
-        for batch in iterator:
-            i += 1
-            text, text_lengths = batch.text
-            predictions = model(text, text_lengths).squeeze(1)
-            loss = criterion(predictions, batch.label)
-            acc = binary_accuracy(predictions, batch.label)
-            epoch_loss += loss.item()
-            epoch_acc += acc.item()
+        # perform gradient descent step
+        loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), GRADIENT_NORM)
+        optimizer.step()
 
-            if i % 10 == 0:
-              print(epoch_acc)
-    
-    return epoch_loss / len(iterator), epoch_acc / len(iterator)
-  
-  
-N_EPOCHS = 1
+        # print loss and generate sample
+        iteration += 1
 
-best_valid_loss = float('inf')
+        if iteration % 50 == 0: 
+            print('Epoch: {}/{}'.format(i, NUM_EPOCHS), 'Iteration: {}'.format(iteration), 'Loss: {}'.format(loss.item()))
+            # print(top_k(model, ["I", "am"], 100, dataset.word_to_integer, dataset.integer_to_word, TOP_K))
 
-for epoch in range(N_EPOCHS): 
-    train_loss, train_acc = train(model, train_iterator, optimizer, criterion)
-    valid_loss, valid_acc = evaluate(model, valid_iterator, criterion)
-    
-    if valid_loss < best_valid_loss:
-        best_valid_loss = valid_loss
-    
-    print(f'Epoch: {epoch+1:02}')
-    print(f'\tTrain Loss: {train_loss:.3f} | Train Acc: {train_acc*100:.2f}%')
-    print(f'\t Val. Loss: {valid_loss:.3f} |  Val. Acc: {valid_acc*100:.2f}%')
+print("Model is finished training.")
+prompt = "Elle est très".split(" ")
 
-torch.save(model, 'models/sentiment.pt')
+torch.save(model, 'models/french.pt')
