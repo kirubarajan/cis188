@@ -4,7 +4,7 @@ from data import CorpusDataset
 from decoding import top_k, get_raw_distribution
 
 # defining hyperparameters
-NUM_EPOCHS = 100
+NUM_EPOCHS = 5
 LEARNING_RATE = 0.01
 GRADIENT_NORM = 5
 EMBEDDING_DIM = 64
