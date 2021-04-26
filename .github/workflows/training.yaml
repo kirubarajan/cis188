@@ -39,6 +39,19 @@ jobs:
           aws_bucket: ${{ secrets.AWS_BUCKET }}
           source_dir: 'models'
 
+  merge:
+    runs-on: self-hosted
+    steps:
+      - name: Merge Train -> Master Branch
+        uses: devmasx/merge-branch@v1.3.1
+        with:
+          type: now
+          target_branch: master
+          github_token: ${{ github.token }}
+
+  cleanup:
+    runs-on: self-hosted
+    steps:
       - name: Cleanup Docker
         if: ${{ always() }}
         run: docker ps -q | xargs -n 1 -P 8 -I {} docker stop {}
