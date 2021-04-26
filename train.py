@@ -4,12 +4,12 @@ from data import CorpusDataset
 from decoding import top_k, get_raw_distribution
 
 # defining hyperparameters
-NUM_EPOCHS = 5
+NUM_EPOCHS = 1
 LEARNING_RATE = 0.01
 GRADIENT_NORM = 5
-EMBEDDING_DIM = 64
+EMBEDDING_DIM = 32
 TOP_K = 5
-HIDDEN_DIM = 64
+HIDDEN_DIM = 32
 BATCH_SIZE = 16
 CHUNK_SIZE = 32
 TRAIN_PATH = "data/french.txt"
