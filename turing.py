@@ -19,10 +19,15 @@ TRAIN_PATH = "data/french.txt"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 dataset = CorpusDataset(TRAIN_PATH, CHUNK_SIZE, BATCH_SIZE)
 model = Model(EMBEDDING_DIM, HIDDEN_DIM, len(dataset.vocabulary), device)
+
 model.load_state_dict(torch.load('models/french.pt'))
 model.eval()
 
-ref = ['it is a white cat .',
-             'wow , this dog is huge .']
-hyp = ['it is a white kitten .',
-            'wowww , the dog is huge !']
+
+# running BLEU evaluation
+ref = [top_k(model, input_sequence.split(), 25, dataset.word_to_integer, dataset.integer_to_word, TOP_K, sample=True)]
+hyp = ['it is a white kitten .', ]
+
+output = list_bleu([ref], hyp)
+with open('results.txt', 'w+') as f:
+    f.write(output)

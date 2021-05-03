@@ -43,6 +43,7 @@ jobs:
           source_dir: 'models'
 
   merge:
+    name: Merge to Master Branch
     needs: installing
     runs-on: self-hosted
     steps:
@@ -54,6 +55,7 @@ jobs:
           github_token: ${{ github.token }}
 
   cleanup:
+    name: Clean Artifacts
     runs-on: self-hosted
     steps:
       - name: Cleanup Docker
