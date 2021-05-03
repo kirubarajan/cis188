@@ -9,8 +9,13 @@ on:
         default: 'heroku'
 
 jobs:
-  deployment:
-    steps:
+    deployment:
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v1
+      - name: Push to Heroku
+        run: git push -f https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/${{ secrets.HEROKU_APP_STAGING }}.git HEAD:refs/heads/master
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
