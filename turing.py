@@ -29,5 +29,5 @@ ref = [top_k(model, input_sequence.split(), 25, dataset.word_to_integer, dataset
 hyp = ['Le comportement de la', ]
 
 output = list_bleu([ref], hyp)
-with open('results.txt', 'w+') as f:
+with open('results/turing.txt', 'w+') as f:
     f.write("BLEU Metric: " + str(output))
