@@ -21,8 +21,10 @@ jobs:
     needs: install
     runs-on: self-hosted
     steps:
+      - name: Clean Results Folder
+        run:  rm -rf results && mkdir results
       - name: Generating Model Predictions
-        run: rm -rf results && python turing.py output.txt
+        run: python turing.py turing.txt
       
       - name: Upload Evaluation Results
         uses: shallwefootball/s3-upload-action@master
