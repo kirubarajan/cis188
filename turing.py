@@ -22,11 +22,11 @@ model = Model(EMBEDDING_DIM, HIDDEN_DIM, len(dataset.vocabulary), device)
 
 model.load_state_dict(torch.load('models/french.pt'))
 model.eval()
-
+input_sequence = "Le"
 
 # running BLEU evaluation
 ref = [top_k(model, input_sequence.split(), 25, dataset.word_to_integer, dataset.integer_to_word, TOP_K, sample=True)]
-hyp = ['it is a white kitten .', ]
+hyp = ['Le comportement de la', ]
 
 output = list_bleu([ref], hyp)
 with open('results.txt', 'w+') as f:
