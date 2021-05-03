@@ -1,0 +1,23 @@
+name: Deployment
+
+on: 
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Host'     
+        required: true
+        default: 'warning'
+
+jobs:
+  installing:
+    name: Installing Dependencies
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Installing Python Dependencies
+        run: pip install -r ./requirements.txt
+
+      - name: Fetching Pre-Trained Language Model
+        run: python -m spacy download en_core_web_sm
