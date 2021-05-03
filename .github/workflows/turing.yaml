@@ -19,10 +19,6 @@ jobs:
       - name: Fetching Pre-Trained Language Model
         run: python -m spacy download en_core_web_sm
 
-      - name: Cleanup Docker
-        if: ${{ always() }}
-        run: docker ps -q | xargs -n 1 -P 8 -I {} docker stop {}
-
   evaluate:
     name: Running Turing Evaluation on Model
     needs: install
@@ -40,3 +36,10 @@ jobs:
           type: now
           target_branch: master
           github_token: ${{ github.token }}
+
+  clean:
+    runs-on: self-hosted
+    steps:
+      - name: Cleanup Docker
+        if: ${{ always() }}
+        run: docker ps -q | xargs -n 1 -P 8 -I {} docker stop {}
