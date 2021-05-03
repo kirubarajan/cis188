@@ -27,5 +27,3 @@ def get_raw_distribution(model, prompt, word_to_integer, integer_to_word):
     for word in prompt:
         word_tensor = torch.tensor([[word_to_integer[word]]])
         output, (hidden_state, cell_state) = model.forward(word_tensor, (hidden_state, cell_state))
-
-    breakpoint()
