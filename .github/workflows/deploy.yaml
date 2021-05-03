@@ -1,23 +1,20 @@
-name: Deployment
+name: ML Application Deployment
 
 on: 
   workflow_dispatch:
     inputs:
       logLevel:
-        description: 'Host'     
+        description: 'Host Location'
         required: true
-        default: 'warning'
+        default: 'heroku'
 
 jobs:
-  installing:
-    name: Installing Dependencies
-    runs-on: self-hosted
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
-
-      - name: Installing Python Dependencies
-        run: pip install -r ./requirements.txt
-
-      - name: Fetching Pre-Trained Language Model
-        run: python -m spacy download en_core_web_sm
+    build:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+        - uses: akhileshns/heroku-deploy@v3.12.12
+          with:
+            heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+            heroku_app_name: "cis188" 
+            heroku_email: "arun.kirubarajan@gmail.com"
