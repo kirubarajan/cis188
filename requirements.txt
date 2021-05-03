@@ -17,8 +17,6 @@ pydantic==1.7.3
 pyparsing==2.4.7
 requests==2.25.1
 smart-open==3.0.0
-spacy==3.0.6
-spacy-legacy==3.0.4
 srsly==2.4.1
 thinc==8.0.3
 torch==1.8.1
