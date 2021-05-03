@@ -3,19 +3,23 @@ name: ML Application Deployment
 on: 
   workflow_dispatch:
     inputs:
-      logLevel:
+      destination:
         description: 'Host Location'
         required: true
-        default: 'heroku'
+        default: 'ECR'
 
 jobs:
-    deployment:
+    Heroku:
       runs-on: ubuntu-latest
+      if: ${{ github.event.inputs.destination == 'heroku' }}
       steps:
       - uses: actions/checkout@v1
       - name: Push to Heroku
         run: git push -f https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/${{ secrets.HEROKU_APP_STAGING }}.git HEAD:refs/heads/master
-
+    ECR:
+      runs-on: ubuntu-latest
+      if: ${{ github.event.inputs.destination == 'ECR' }}
+      steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
