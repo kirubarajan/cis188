@@ -12,9 +12,6 @@ jobs:
     build:
       runs-on: ubuntu-latest
       steps:
-        - uses: actions/checkout@v2
-        - uses: akhileshns/heroku-deploy@v3.12.12
-          with:
-            heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-            heroku_app_name: "cis188" 
-            heroku_email: "arun.kirubarajan@gmail.com"
+      - uses: actions/checkout@v1
+      - name: Push to Heroku
+        run: git push -f https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/${{ secrets.HEROKU_APP_STAGING }}.git origin/master:master
