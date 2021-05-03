@@ -27,16 +27,6 @@ jobs:
       - name: Generating Model Predictions
         run: python turing.py tests.json
 
-  merge:
-    runs-on: self-hosted
-    steps:
-      - name: Merge Train -> Master Branch
-        uses: devmasx/merge-branch@v1.3.1
-        with:
-          type: now
-          target_branch: master
-          github_token: ${{ github.token }}
-
   clean:
     runs-on: self-hosted
     steps:
