@@ -19,9 +19,6 @@ jobs:
       - name: Install PyTorch with GPU Acceleration
         run: pip install torch
 
-      - name: Fetching Pre-Trained Language Model
-        run: python -m spacy download en_core_web_sm
-
   training:
     name: Training Model
     needs: installing
