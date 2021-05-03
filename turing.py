@@ -30,4 +30,4 @@ hyp = ['Le comportement de la', ]
 
 output = list_bleu([ref], hyp)
 with open('results.txt', 'w+') as f:
-    f.write(output)
+    f.write("BLEU Metric: " + str(output))
