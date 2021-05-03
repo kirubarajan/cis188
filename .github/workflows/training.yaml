@@ -43,6 +43,7 @@ jobs:
           source_dir: 'models'
 
   merge:
+    needs: training
     runs-on: self-hosted
     steps:
       - name: Merge Train -> Master Branch
@@ -53,6 +54,7 @@ jobs:
           github_token: ${{ github.token }}
 
   cleanup:
+    needs: training
     runs-on: self-hosted
     steps:
       - name: Cleanup Docker
