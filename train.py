@@ -50,4 +50,4 @@ for i in range(NUM_EPOCHS):
 print("Model is finished training.")
 prompt = "Elle est très".split(" ")
 
-torch.save(model, 'models/french.pt')
+torch.save(model.state_dict(), 'models/french.pt')

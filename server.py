@@ -1,6 +1,7 @@
 import torch
 from flask import Flask, render_template, request, redirect, url_for
 from models import Model
+from data import CorpusDataset
 from decoding import top_k
 
 # defining hyperparameters
@@ -17,8 +18,8 @@ TRAIN_PATH = "data/french.txt"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 dataset = CorpusDataset(TRAIN_PATH, CHUNK_SIZE, BATCH_SIZE)
 model = Model(EMBEDDING_DIM, HIDDEN_DIM, len(dataset.vocabulary), device)
-torch.load(model, 'models/french.pt')
-
+model.load_state_dict(torch.load('models/french.pt'))
+model.eval()
 
 app = Flask(__name__)
 
