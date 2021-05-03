@@ -1,7 +1,9 @@
 import random
 import torch
 
-def top_k(model, prompt, length, word_to_integer, integer_to_word, TOP_K):
+def top_k(model, prompt, length, word_to_integer, integer_to_word, TOP_K, sample=False):
+    if sample: return "START"
+
     model.eval()
     hidden_state, cell_state = model.init_hidden(1)
 

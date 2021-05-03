@@ -14,13 +14,10 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Installing Python Dependencies
-        run: cat requirements.txt | xargs -n 1 pip install
+        run: pip install -r ./requirements_gpu.txt
 
       - name: Install PyTorch with GPU Acceleration
         run: pip install torch
-
-      - name: Fetching Pre-Trained Language Model
-        run: python -m spacy download en_core_web_sm
 
   training:
     name: Training Model
@@ -43,6 +40,8 @@ jobs:
           source_dir: 'models'
 
   merge:
+    name: Merge to Master Branch
+    needs: installing
     runs-on: self-hosted
     steps:
       - name: Merge Train -> Master Branch
@@ -53,6 +52,7 @@ jobs:
           github_token: ${{ github.token }}
 
   cleanup:
+    name: Clean Artifacts
     runs-on: self-hosted
     steps:
       - name: Cleanup Docker

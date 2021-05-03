@@ -28,7 +28,7 @@ app = Flask(__name__)
 def splash():
     data = request.get_json()
     input_sequence = data['input']
-    output_sequence = top_k(model, input_sequence.split(), 25, dataset.word_to_integer, dataset.integer_to_word, TOP_K)
+    output_sequence = top_k(model, input_sequence.split(), 25, dataset.word_to_integer, dataset.integer_to_word, TOP_K, sample=True)
 
     return {'prediction': output_sequence}
 
